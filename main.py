@@ -1,5 +1,6 @@
 import sublime
 import sublime_plugin
+import fnmatch
 import os
 import subprocess
 import json
@@ -70,7 +71,10 @@ class GruntRunner(object):
         self.folders = get_grunt_file_paths()
         self.grunt_files = []
         for f in self.window.folders():
-            self.folders.append(f)
+            for root, dirnames, filenames in os.walk(f):
+                for gruntfilename in ['Gruntfile.js', 'Gruntfile.coffee']:
+                    for filename in fnmatch.filter(filenames, gruntfilename):
+                        self.grunt_files.append(os.path.join(root, filename))
 
         for f in self.folders:
             if os.path.exists(os.path.join(f, "Gruntfile.js")):
